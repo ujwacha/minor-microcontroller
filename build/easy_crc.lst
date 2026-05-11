@@ -1,0 +1,228 @@
+ARM GAS  /tmp/cctgsf8X.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"easy_crc.c"
+  12              		.text
+  13              	.Ltext0:
+  14              		.cfi_sections	.debug_frame
+  15              		.section	.text.calculate_cr8x_fast,"ax",%progbits
+  16              		.align	1
+  17              		.global	calculate_cr8x_fast
+  18              		.arch armv7-m
+  19              		.syntax unified
+  20              		.thumb
+  21              		.thumb_func
+  22              		.fpu softvfp
+  24              	calculate_cr8x_fast:
+  25              	.LVL0:
+  26              	.LFB0:
+  27              		.file 1 "robotlib/crypto/easy_crc.c"
+   1:robotlib/crypto/easy_crc.c **** #include "easy_crc.h"
+   2:robotlib/crypto/easy_crc.c **** 
+   3:robotlib/crypto/easy_crc.c **** static uint8_t crc8x_table[256] = {
+   4:robotlib/crypto/easy_crc.c ****   0x0, 0x7, 0xe, 0x9, 0x1c, 0x1b, 0x12, 0x15, 0x38, 0x3f, 0x36, 0x31, 0x24, 0x23, 0x2a, 0x2d,
+   5:robotlib/crypto/easy_crc.c ****   0x70, 0x77, 0x7e, 0x79, 0x6c, 0x6b, 0x62, 0x65, 0x48, 0x4f, 0x46, 0x41, 0x54, 0x53, 0x5a, 0x5d,
+   6:robotlib/crypto/easy_crc.c ****   0xe0, 0xe7, 0xee, 0xe9, 0xfc, 0xfb, 0xf2, 0xf5, 0xd8, 0xdf, 0xd6, 0xd1, 0xc4, 0xc3, 0xca, 0xcd,
+   7:robotlib/crypto/easy_crc.c ****   0x90, 0x97, 0x9e, 0x99, 0x8c, 0x8b, 0x82, 0x85, 0xa8, 0xaf, 0xa6, 0xa1, 0xb4, 0xb3, 0xba, 0xbd,
+   8:robotlib/crypto/easy_crc.c ****   0xc7, 0xc0, 0xc9, 0xce, 0xdb, 0xdc, 0xd5, 0xd2, 0xff, 0xf8, 0xf1, 0xf6, 0xe3, 0xe4, 0xed, 0xea,
+   9:robotlib/crypto/easy_crc.c ****   0xb7, 0xb0, 0xb9, 0xbe, 0xab, 0xac, 0xa5, 0xa2, 0x8f, 0x88, 0x81, 0x86, 0x93, 0x94, 0x9d, 0x9a,
+  10:robotlib/crypto/easy_crc.c ****   0x27, 0x20, 0x29, 0x2e, 0x3b, 0x3c, 0x35, 0x32, 0x1f, 0x18, 0x11, 0x16, 0x3, 0x4, 0xd, 0xa,
+  11:robotlib/crypto/easy_crc.c ****   0x57, 0x50, 0x59, 0x5e, 0x4b, 0x4c, 0x45, 0x42, 0x6f, 0x68, 0x61, 0x66, 0x73, 0x74, 0x7d, 0x7a,
+  12:robotlib/crypto/easy_crc.c ****   0x89, 0x8e, 0x87, 0x80, 0x95, 0x92, 0x9b, 0x9c, 0xb1, 0xb6, 0xbf, 0xb8, 0xad, 0xaa, 0xa3, 0xa4,
+  13:robotlib/crypto/easy_crc.c ****   0xf9, 0xfe, 0xf7, 0xf0, 0xe5, 0xe2, 0xeb, 0xec, 0xc1, 0xc6, 0xcf, 0xc8, 0xdd, 0xda, 0xd3, 0xd4,
+  14:robotlib/crypto/easy_crc.c ****   0x69, 0x6e, 0x67, 0x60, 0x75, 0x72, 0x7b, 0x7c, 0x51, 0x56, 0x5f, 0x58, 0x4d, 0x4a, 0x43, 0x44,
+  15:robotlib/crypto/easy_crc.c ****   0x19, 0x1e, 0x17, 0x10, 0x5, 0x2, 0xb, 0xc, 0x21, 0x26, 0x2f, 0x28, 0x3d, 0x3a, 0x33, 0x34,
+  16:robotlib/crypto/easy_crc.c ****   0x4e, 0x49, 0x40, 0x47, 0x52, 0x55, 0x5c, 0x5b, 0x76, 0x71, 0x78, 0x7f, 0x6a, 0x6d, 0x64, 0x63,
+  17:robotlib/crypto/easy_crc.c ****   0x3e, 0x39, 0x30, 0x37, 0x22, 0x25, 0x2c, 0x2b, 0x6, 0x1, 0x8, 0xf, 0x1a, 0x1d, 0x14, 0x13,
+  18:robotlib/crypto/easy_crc.c ****   0xae, 0xa9, 0xa0, 0xa7, 0xb2, 0xb5, 0xbc, 0xbb, 0x96, 0x91, 0x98, 0x9f, 0x8a, 0x8d, 0x84, 0x83,
+  19:robotlib/crypto/easy_crc.c ****   0xde, 0xd9, 0xd0, 0xd7, 0xc2, 0xc5, 0xcc, 0xcb, 0xe6, 0xe1, 0xe8, 0xef, 0xfa, 0xfd, 0xf4, 0xf3};
+  20:robotlib/crypto/easy_crc.c **** 
+  21:robotlib/crypto/easy_crc.c **** 
+  22:robotlib/crypto/easy_crc.c **** 
+  23:robotlib/crypto/easy_crc.c **** 
+  24:robotlib/crypto/easy_crc.c **** uint8_t calculate_cr8x_fast(uint8_t *data, size_t len)
+  25:robotlib/crypto/easy_crc.c **** {
+  28              		.loc 1 25 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  33              		.loc 1 25 1 is_stmt 0 view .LVU1
+ARM GAS  /tmp/cctgsf8X.s 			page 2
+
+
+  34 0000 8446     		mov	ip, r0
+  26:robotlib/crypto/easy_crc.c **** 
+  27:robotlib/crypto/easy_crc.c ****   uint8_t crc = 0x00; // init value
+  35              		.loc 1 27 3 is_stmt 1 view .LVU2
+  36              	.LVL1:
+  28:robotlib/crypto/easy_crc.c ****   for (size_t i = 0; i < len; i++)
+  37              		.loc 1 28 3 view .LVU3
+  38              	.LBB2:
+  39              		.loc 1 28 8 view .LVU4
+  40              		.loc 1 28 15 is_stmt 0 view .LVU5
+  41 0002 0023     		movs	r3, #0
+  42              	.LBE2:
+  27:robotlib/crypto/easy_crc.c ****   for (size_t i = 0; i < len; i++)
+  43              		.loc 1 27 11 view .LVU6
+  44 0004 1846     		mov	r0, r3
+  45              	.LVL2:
+  46              	.LBB3:
+  47              		.loc 1 28 22 is_stmt 1 view .LVU7
+  48              		.loc 1 28 3 is_stmt 0 view .LVU8
+  49 0006 8B42     		cmp	r3, r1
+  50 0008 0AD2     		bcs	.L8
+  51              	.LBE3:
+  25:robotlib/crypto/easy_crc.c **** 
+  52              		.loc 1 25 1 view .LVU9
+  53 000a 10B4     		push	{r4}
+  54              	.LCFI0:
+  55              		.cfi_def_cfa_offset 4
+  56              		.cfi_offset 4, -4
+  57              	.LVL3:
+  58              	.L3:
+  59              	.LBB4:
+  29:robotlib/crypto/easy_crc.c ****     {
+  30:robotlib/crypto/easy_crc.c ****       crc = crc8x_table[data[i] ^ crc];
+  60              		.loc 1 30 7 is_stmt 1 discriminator 3 view .LVU10
+  61              		.loc 1 30 29 is_stmt 0 discriminator 3 view .LVU11
+  62 000c 1CF80320 		ldrb	r2, [ip, r3]	@ zero_extendqisi2
+  63              		.loc 1 30 33 discriminator 3 view .LVU12
+  64 0010 4240     		eors	r2, r2, r0
+  65              		.loc 1 30 11 discriminator 3 view .LVU13
+  66 0012 044C     		ldr	r4, .L9
+  67 0014 A05C     		ldrb	r0, [r4, r2]	@ zero_extendqisi2
+  68              	.LVL4:
+  28:robotlib/crypto/easy_crc.c ****     {
+  69              		.loc 1 28 31 is_stmt 1 discriminator 3 view .LVU14
+  28:robotlib/crypto/easy_crc.c ****     {
+  70              		.loc 1 28 32 is_stmt 0 discriminator 3 view .LVU15
+  71 0016 0133     		adds	r3, r3, #1
+  72              	.LVL5:
+  28:robotlib/crypto/easy_crc.c ****     {
+  73              		.loc 1 28 22 is_stmt 1 discriminator 3 view .LVU16
+  28:robotlib/crypto/easy_crc.c ****     {
+  74              		.loc 1 28 3 is_stmt 0 discriminator 3 view .LVU17
+  75 0018 8B42     		cmp	r3, r1
+  76 001a F7D3     		bcc	.L3
+  77              	.LBE4:
+  31:robotlib/crypto/easy_crc.c ****     }
+  32:robotlib/crypto/easy_crc.c ****   return crc;
+ARM GAS  /tmp/cctgsf8X.s 			page 3
+
+
+  78              		.loc 1 32 3 is_stmt 1 view .LVU18
+  33:robotlib/crypto/easy_crc.c **** }
+  79              		.loc 1 33 1 is_stmt 0 view .LVU19
+  80 001c 10BC     		pop	{r4}
+  81              	.LCFI1:
+  82              		.cfi_restore 4
+  83              		.cfi_def_cfa_offset 0
+  84 001e 7047     		bx	lr
+  85              	.LVL6:
+  86              	.L8:
+  87              		.loc 1 33 1 view .LVU20
+  88 0020 7047     		bx	lr
+  89              	.L10:
+  90 0022 00BF     		.align	2
+  91              	.L9:
+  92 0024 00000000 		.word	.LANCHOR0
+  93              		.cfi_endproc
+  94              	.LFE0:
+  96              		.section	.rodata.crc8x_table,"a"
+  97              		.align	2
+  98              		.set	.LANCHOR0,. + 0
+ 101              	crc8x_table:
+ 102 0000 00070E09 		.ascii	"\000\007\016\011\034\033\022\0258?61$#*-pw~ylkbeHOF"
+ 102      1C1B1215 
+ 102      383F3631 
+ 102      24232A2D 
+ 102      70777E79 
+ 103 001b 4154535A 		.ascii	"ATSZ]\340\347\356\351\374\373\362\365\330\337\326\321"
+ 103      5DE0E7EE 
+ 103      E9FCFBF2 
+ 103      F5D8DFD6 
+ 103      D1
+ 104 002c C4C3CACD 		.ascii	"\304\303\312\315\220\227\236\231\214\213\202\205\250"
+ 104      90979E99 
+ 104      8C8B8285 
+ 104      A8
+ 105 0039 AFA6A1B4 		.ascii	"\257\246\241\264\263\272\275\307\300\311\316\333\334"
+ 105      B3BABDC7 
+ 105      C0C9CEDB 
+ 105      DC
+ 106 0046 D5D2FFF8 		.ascii	"\325\322\377\370\361\366\343\344\355\352\267\260\271"
+ 106      F1F6E3E4 
+ 106      EDEAB7B0 
+ 106      B9
+ 107 0053 BEABACA5 		.ascii	"\276\253\254\245\242\217\210\201\206\223\224\235\232"
+ 107      A28F8881 
+ 107      8693949D 
+ 107      9A
+ 108 0060 2720292E 		.ascii	"' ).;<52\037\030\021\026\003\004\015\012WPY^KLEBoha"
+ 108      3B3C3532 
+ 108      1F181116 
+ 108      03040D0A 
+ 108      5750595E 
+ 109 007b 6673747D 		.ascii	"fst}z\211\216\207\200\225\222\233\234\261\266\277\270"
+ 109      7A898E87 
+ 109      8095929B 
+ 109      9CB1B6BF 
+ARM GAS  /tmp/cctgsf8X.s 			page 4
+
+
+ 109      B8
+ 110 008c ADAAA3A4 		.ascii	"\255\252\243\244\371\376\367\360\345\342\353\354\301"
+ 110      F9FEF7F0 
+ 110      E5E2EBEC 
+ 110      C1
+ 111 0099 C6CFC8DD 		.ascii	"\306\317\310\335\332\323\324ing`ur{|QV_XMJCD\031\036"
+ 111      DAD3D469 
+ 111      6E676075 
+ 111      727B7C51 
+ 111      565F584D 
+ 112 00b2 17100502 		.ascii	"\027\020\005\002\013\014!&/(=:34NI@GRU\\[vqx\177jmd"
+ 112      0B0C2126 
+ 112      2F283D3A 
+ 112      33344E49 
+ 112      40475255 
+ 113 00cf 633E3930 		.ascii	"c>907\"%,+\006\001\010\017\032\035\024\023\256\251\240"
+ 113      3722252C 
+ 113      2B060108 
+ 113      0F1A1D14 
+ 113      13AEA9A0 
+ 114 00e3 A7B2B5BC 		.ascii	"\247\262\265\274\273\226\221\230\237\212\215\204\203"
+ 114      BB969198 
+ 114      9F8A8D84 
+ 114      83
+ 115 00f0 DED9D0D7 		.ascii	"\336\331\320\327\302\305\314\313\346\341\350\357\372"
+ 115      C2C5CCCB 
+ 115      E6E1E8EF 
+ 115      FA
+ 116 00fd FDF4F3   		.ascii	"\375\364\363"
+ 117              		.text
+ 118              	.Letext0:
+ 119              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+ 120              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
+ARM GAS  /tmp/cctgsf8X.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 easy_crc.c
+     /tmp/cctgsf8X.s:16     .text.calculate_cr8x_fast:0000000000000000 $t
+     /tmp/cctgsf8X.s:24     .text.calculate_cr8x_fast:0000000000000000 calculate_cr8x_fast
+     /tmp/cctgsf8X.s:92     .text.calculate_cr8x_fast:0000000000000024 $d
+     /tmp/cctgsf8X.s:97     .rodata.crc8x_table:0000000000000000 $d
+     /tmp/cctgsf8X.s:101    .rodata.crc8x_table:0000000000000000 crc8x_table
+
+NO UNDEFINED SYMBOLS

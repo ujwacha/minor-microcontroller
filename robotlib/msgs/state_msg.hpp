@@ -10,11 +10,10 @@
 struct Twist
 {
     float vx = 0.0f;
-    float vy = 0.0f;
     float w = 0.0f;
 
-    Twist(float _vx, float _vy, float _w)
-        : vx(_vx), vy(_vy), w(_w) {}
+    Twist(float _vx, float _w)
+        : vx(_vx), w(_w) {}
 
     Twist() = default;
 };

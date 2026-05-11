@@ -6,7 +6,7 @@
 
 #include "gpio.h"
 #include "dma.h"
-#include "spi.h"
+// #include "spi.h"
 #include "main.h"
 #include "tim.h"
 #include "usart.h"
@@ -16,21 +16,19 @@
 #include "pid.hpp"
 #include "encoder.hpp"
 #include "uart.hpp"
-#include "bno08_spi.hpp"
 #include "state_msg.hpp"
 
 /* Robot Dimensions */
-#define BASE_DIAMETER 0.61f
-#define WHEEL_DIAMETER 0.152f
+#define BASE_DIAMETER 0.24f
+#define WHEEL_DIAMETER 0.0657f
 
 /* Robot Maximum Limits */
 #define MAXIMUM_VELOCITY 1.0f
 #define MAXIMUM_OMEGA 1.0f
 
 /* Base Motors Limit */
-#define MAX_MOTOR_OMEGA 91.0f // rad/s
-#define MAX_MOTOR0_PWM 0.95f
-#define MAX_MOTOR1_PWM 0.93f
+#define MAX_MOTOR_OMEGA 76.0f // rad/s
+#define MAX_MOTOR_PWM 0.95f
 
 #define ROBOT_LOOP_PERIOD 10
 
@@ -40,21 +38,24 @@ private:
   uint32_t robot_loop_tick;
   Twist twist;
 
-  const float kp[2] = {0.7f, 0.7f};
-  const float ki[2] = {12.0f, 12.0f};
-  const float kd[2] = {0.0005f, 0.0005f};
+  const float kp[2] = {6.0f, 6.0f};
+  const float ki[2] = {8.0f, 8.00f};
+  const float kd[2] = {0.0050f, 0.0050f};
 
 public:
   Motor left_motor = Motor(&MLP_TIMER, TIM_CHANNEL_1, MLD_GPIO_Port, MLD_Pin);
-  Motor right_motor = Motor(&MRP_TIMER, TIM_CHANNEL_2, MLD_GPIO_Port, MLD_Pin);
+  Motor right_motor = Motor(&MRP_TIMER, TIM_CHANNEL_2, MRD_GPIO_Port, MRD_Pin);
 
-  Encoder left_encoder = Encoder(&htim3, 1000, ROBOT_LOOP_PERIOD);
-  Encoder right_encoder = Encoder(&htim4, 1000, ROBOT_LOOP_PERIOD);
+  Encoder left_encoder = Encoder(&htim2, 830, ROBOT_LOOP_PERIOD);
+  Encoder right_encoder = Encoder(&htim1, 830, ROBOT_LOOP_PERIOD, true);
+
+	int32_t left_count = 0;
+	int32_t right_count = 0;
 
   PID left_pid = PID(kp[0], ki[0], kd[0], -MAX_MOTOR_OMEGA, MAX_MOTOR_OMEGA, ROBOT_LOOP_PERIOD);
-  PID right_pid = PID(kp[0], ki[0], kd[0], -MAX_MOTOR_OMEGA, MAX_MOTOR_OMEGA, ROBOT_LOOP_PERIOD);
+  PID right_pid = PID(kp[1], ki[1], kd[1], -MAX_MOTOR_OMEGA, MAX_MOTOR_OMEGA, ROBOT_LOOP_PERIOD);
 
-  UART main_uart = UART(&huart3, UART_BOTH, sizeof(Twist), sizeof(ImuData));
+  UART main_uart = UART(&huart3, UART_BOTH, sizeof(Twist), sizeof(char)*6);
 
   void init();
   void run();
